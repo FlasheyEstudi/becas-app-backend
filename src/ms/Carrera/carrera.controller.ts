@@ -1,13 +1,14 @@
-import { Controller, Post, Body, Get, Param, Delete } from '@nestjs/common';
-import { carreraService } from './carrera.service';
-import { CreatecarreraDto } from './dto/create-carrera.dto';
+// src/ms/Carrera/carrera.controller.ts
+import { Controller, Post, Body, Get, Param, Delete, Put } from '@nestjs/common';
+import { CarreraService } from './carrera.service'; // Corregido: CarreraService (mayúscula)
+import { CreateCarreraDto } from './dto/create-carrera.dto'; // Corregido: CreateCarreraDto (mayúscula)
 
 @Controller('carrera')
-export class carreraController {
-  constructor(private readonly carreraService: carreraService) {}
+export class CarreraController {
+  constructor(private readonly carreraService: CarreraService) {} // Corregido
 
   @Post('/add')
-  create(@Body() dto: CreatecarreraDto) {
+  create(@Body() dto: CreateCarreraDto) { // Corregido
     return this.carreraService.create(dto);
   }
 
@@ -16,17 +17,18 @@ export class carreraController {
     return this.carreraService.findAll();
   }
 
- @Get(':id')
-findOne(@Param('id') id: string) {
-  const idNum = Number(id);
-  
-  return this.carreraService.findOne(idNum);
-}
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.carreraService.findOne(Number(id));
+  }
 
+  @Put(':id')
+  update(@Param('id') id: string, @Body() dto: CreateCarreraDto) { // Corregido
+    return this.carreraService.update(Number(id), dto);
+  }
 
   @Delete(':id')
-  Remove(@Param('id') id: string) {
+  remove(@Param('id') id: string) {
     return this.carreraService.remove(Number(id));
   }
 }
-

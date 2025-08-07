@@ -4,8 +4,6 @@ export class CreateEstudianteDto {
   apellido: string;
   edad: number;
   correo: string;
-
-  EstadoId?: number;   // Nuevo campo opcional
-  carreraId?: number;  // Nuevo campo opcional
-  
+  EstadoId?: number;
+  carreraId?: number;
 }

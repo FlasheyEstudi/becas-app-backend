@@ -1,10 +1,14 @@
+// src/ms/Carrera/carrera.module.ts
 import { Module } from '@nestjs/common';
-import { carreraController } from './carrera.controller';
-import { carreraService } from './carrera.service';
-import { SqlService } from '../cnxjs/sql.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Carrera } from './entities/carrera.entity';
+import { CarreraController } from './carrera.controller';
+import { CarreraService } from './carrera.service';
 
 @Module({
-  controllers: [carreraController],
-  providers: [carreraService, SqlService]
+  imports: [TypeOrmModule.forFeature([Carrera])],
+  controllers: [CarreraController],
+  providers: [CarreraService],
+  exports: [CarreraService],
 })
-export class carreraModule {}
+export class CarreraModule { }

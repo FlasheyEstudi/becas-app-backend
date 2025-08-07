@@ -1,9 +1,7 @@
 export class CreateTipoBecaDto {
-  
   Id?: number;
-  Nombre: string;
+  nombre: string; // Cambiado de "Nombre" a "nombre"
   Descripcion: string;
   Monto: number;
   EstadoId: number;
-  nombre: any;
 }

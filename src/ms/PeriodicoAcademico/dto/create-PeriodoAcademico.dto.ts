@@ -1,10 +1,8 @@
 export class CreatePeriodoAcademicoDto {
-  
   Id?: number;
-  Nombre: string;
+  nombre: string; // Cambiado de "Nombre" a "nombre"
   AnioAcademico: string;
- FechaInicio: string;
- FechaFin:  string;
+  FechaInicio: string;
+  FechaFin: string;
   EstadoId: number;
-  nombre: any;
 }

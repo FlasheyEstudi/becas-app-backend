@@ -1,11 +1,25 @@
+import { IsDateString, IsNotEmpty } from 'class-validator';
+
 export class CreateSolicitudBecaDto {
-  
-  Id?: number;
-  EstudianteId: number;
-  TipoBecaId: number;
-  EstadoId: number;
-  FechaSolicitud: string;
-  PeriodoAcademicoId: number;
-  Observaciones: string;
-  Fecha_resultado: string;
+  @IsNotEmpty()
+  estudianteId: number;
+
+  @IsNotEmpty()
+  tipoBecaId: number;
+
+  @IsNotEmpty()
+  estadoId: number;
+
+  @IsNotEmpty()
+  @IsDateString()
+  fechaSolicitud: string;
+
+  @IsNotEmpty()
+  periodoAcademicoId: number;
+
+  @IsNotEmpty()
+  observaciones: string;
+
+  @IsDateString()
+  fechaResultado?: string;
 }

@@ -1,83 +1,40 @@
+// src/ms/AreaConocimiento/AreaConocimiento.service.ts
 import { Injectable } from '@nestjs/common';
-import { SqlService } from '../../ms/cnxjs/sql.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AreaConocimiento } from './entities/area-conocimiento.entity';
 import { CreateAreaConocimientoDto } from './dto/create-AreaConocimiento.dto';
 
 @Injectable()
 export class AreaConocimientoService {
-  constructor(private readonly sqlService: SqlService) {}
+  constructor(
+    @InjectRepository(AreaConocimiento)
+    private areaConocimientoRepository: Repository<AreaConocimiento>,
+  ) {}
 
-  async create(obj: CreateAreaConocimientoDto) {
-    try {
-      const pool = await this.sqlService.getConnection();
-      const request = pool.request();
-
-      const id = obj.Id ?? 0;
-
-      request.input('Id', id);
-      request.input('nombre', obj.nombre);
-     
-      const result: any = await request.execute('Beca.sp_Save_AreaConocimiento');
-
-      console.log('Resultado del SP:', result);
-
-      if (result.recordset && result.recordset.length > 0) {
-        const resp = result.recordset[0].NewId || result.recordset[0].UpdatedId || result.recordset[0].Id;
-        return { id: resp };
-      } else {
-        return { id };
-      }
-    } catch (e) {
-      console.error('Error al ejecutar el SP:', JSON.stringify(e, null, 2));
-      return { error: 'Error interno', detalle: e.message ?? e };
-    }
+  async create(dto: CreateAreaConocimientoDto): Promise<AreaConocimiento> {
+    const areaConocimiento = this.areaConocimientoRepository.create(dto);
+    return this.areaConocimientoRepository.save(areaConocimiento);
   }
 
-  async findAll() {
-    try {
-      const pool = await this.sqlService.getConnection();
-      const request = pool.request();
-
-      request.input('Id', 0);
-      const result: any = await request.execute('Beca.sp_Get_AreaConocimiento');
-
-      return result.recordset;
-    } catch (e) {
-      console.error('Error al obtener el Area De Conocimiento', JSON.stringify(e, null, 2));
-      return { error: 'Error al obtener el Area de Conocimiento', detalle: e.message ?? e };
-    }
+  findAll(): Promise<AreaConocimiento[]> {
+    return this.areaConocimientoRepository.find();
   }
 
-  async findOne(id: number) {
-    try {
-      const pool = await this.sqlService.getConnection();
-      const request = pool.request();
-
-      request.input('Id', id);
-      const result: any = await request.execute('Beca.sp_Get_AreaConocimiento');
-
-      if (result.recordset.length === 0) {
-        return { mensaje: `AreaConocimiento con ID ${id} no encontrado` };
-      }
-
-      return result.recordset[0];
-    } catch (e) {
-      console.error('Error al buscar el Area de Conocimiento por ID:', JSON.stringify(e, null, 2));
-      return { error: 'Error al buscar el Area de Conocimiento', detalle: e.message ?? e };
-    }
+  async findOne(id: number): Promise<AreaConocimiento | null> {
+    return this.areaConocimientoRepository.findOne({ where: { id } });
   }
 
-  async remove(id: number) {
-    try {
-      const pool = await this.sqlService.getConnection();
-      const request = pool.request();
-
-      request.input('Id', id);
-      await request.execute('Beca.sp_Delete_AreaConocimiento');
-
-      return { mensaje: `AreaConocimiento con ID ${id} eliminado correctamente` };
-    } catch (e) {
-      console.error('Error al eliminar el Area de Conocimiento:', JSON.stringify(e, null, 2));
-      return { error: 'Error al eliminar el Area de Conocimiento', detalle: e.message ?? e };
+  async update(id: number, dto: CreateAreaConocimientoDto): Promise<AreaConocimiento> {
+    await this.areaConocimientoRepository.update(id, dto);
+    const updatedArea = await this.areaConocimientoRepository.findOne({ where: { id } });
+    if (!updatedArea) {
+      throw new Error(`AreaConocimiento with ID ${id} not found`);
     }
+    return updatedArea;
+  }
+
+  async remove(id: number): Promise<void> {
+    await this.areaConocimientoRepository.delete(id);
   }
 }

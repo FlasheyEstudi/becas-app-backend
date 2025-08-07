@@ -1,10 +1,14 @@
+// src/ms/PeriodicoAcademico/PeriodoAcademico.module.ts
 import { Module } from '@nestjs/common';
-import {PeriodoAcademicoController } from './PeriodoAcademico.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PeriodoAcademico } from './entities/periodo-academico.entity';
+import { PeriodoAcademicoController } from './PeriodoAcademico.controller';
 import { PeriodoAcademicoService } from './PeriodoAcademico.service';
-import { SqlService } from '../cnxjs/sql.service';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([PeriodoAcademico])],
   controllers: [PeriodoAcademicoController],
-  providers: [PeriodoAcademicoService, SqlService]
+  providers: [PeriodoAcademicoService],
+  exports: [PeriodoAcademicoService],
 })
-export class PeriodoAcademicoModule {}
+export class PeriodoAcademicoModule { }

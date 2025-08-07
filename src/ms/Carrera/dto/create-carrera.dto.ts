@@ -1,6 +1,5 @@
-export class CreatecarreraDto {
+export class CreateCarreraDto {
   Id?: number;
-  Nombre: string;
-  AreaConocimientoId: number ;
-  nombre: any;
+  nombre: string; // Cambiado de "Nombre" a "nombre" para consistencia
+  AreaConocimientoId: number;
 }

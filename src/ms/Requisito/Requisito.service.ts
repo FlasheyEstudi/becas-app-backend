@@ -1,200 +1,62 @@
+// src/ms/Requisito/Requisito.service.ts
 import { Injectable } from '@nestjs/common';
-import { SqlService } from '../../ms/cnxjs/sql.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Requisito } from './entities/requisito.entity';
 import { CreateRequisitoDto } from './dto/create-Requisito.dto';
+import { UpdateRequisitoDto } from './dto/update-Requisito.dto';
 
 @Injectable()
 export class RequisitoService {
-  constructor(private readonly sqlService: SqlService) {}
+  constructor(
+    @InjectRepository(Requisito)
+    private requisitoRepository: Repository<Requisito>,
+  ) {}
 
- 
-
-  async create(obj: CreateRequisitoDto) {
-  try {
-    console.log('📥 DTO recibido en create():', obj);
-
-    // Validar que EstudianteId sea estrictamente un número válido (no booleano ni otro tipo)
-    if (typeof obj.EstudianteId !== 'number' || isNaN(obj.EstudianteId)) {
-      return { error: 'EstudianteId debe ser un número válido, no booleano u otro tipo.' };
+  async create(dto: CreateRequisitoDto): Promise<Requisito> {
+    // Validación básica
+    if (!dto.Descripcion?.trim()) {
+      throw new Error('La descripción es requerida');
+    }
+    
+    if (!dto.estadoId || dto.estadoId <= 0) {
+      throw new Error('El ID del estado es requerido y debe ser válido');
     }
 
-    const pool = await this.sqlService.getConnection();
-    const request = pool.request();
-
-    const id = obj.Id ?? 0;
-    const EstudianteId = Number(obj.EstudianteId);  // Ya validado como número
-    const EstadoId = Number(obj.EstadoId);
-
-    request.input('Id', id);
-    request.input('Descripcion', obj.Descripcion);
-    request.input('EstudianteId', EstudianteId);
-    request.input('EstadoId', EstadoId);
-
-    const result: any = await request.execute('Beca.sp_Save_Requisito');
-
-    const requisitoId =
-      result.recordset?.[0]?.NewId ||
-      result.recordset?.[0]?.UpdatedId ||
-      id;
-
-    const estudianteResult = await pool
-      .request()
-      .input('Id', EstudianteId)
-      .execute('Beca.sp_Get_Estudiante');
-    const estudianteNombre = estudianteResult.recordset?.[0]
-      ? `${estudianteResult.recordset[0].Nombre} ${estudianteResult.recordset[0].Apellido}`
-      : null;
-
-    const estadoResult = await pool
-      .request()
-      .input('Id', EstadoId)
-      .execute('Beca.sp_Get_Estado');
-    const estadoNombre = estadoResult.recordset?.[0]?.Nombre ?? null;
-
-    return {
-      id: requisitoId,
-      Descripcion: obj.Descripcion,
-      EstudianteId,
-      Estudiantenombre: estudianteNombre,
-      EstadoId,
-      Estadonombre: estadoNombre,
-    };
-  } catch (e) {
-    console.error('Error al ejecutar el SP:', JSON.stringify(e, null, 2));
-    return { error: 'Error interno', detalle: e.message ?? e };
+    const requisito = this.requisitoRepository.create(dto);
+    return this.requisitoRepository.save(requisito);
   }
-}
-  async findAll() {
-    try {
-      const pool = await this.sqlService.getConnection();
 
-      const requisitoResult: any = await pool
-        .request()
-        .input('Id', 0)
-        .execute('Beca.sp_Get_Requisito');
-      const requisitos = requisitoResult.recordset;
+  findAll(): Promise<Requisito[]> {
+    return this.requisitoRepository.find();
+  }
 
-      const estudiantesResult: any = await pool
-        .request()
-        .input('Id', 0)
-        .execute('Beca.sp_Get_Estudiante');
-      const estudiantes = estudiantesResult.recordset;
-      console.log('Estudiante Result:', estudiantesResult.recordset);
+  async findOne(id: number): Promise<Requisito | null> {
+    return this.requisitoRepository.findOne({ where: { id } });
+  }
 
-      const estadosResult: any = await pool
-        .request()
-        .input('Id', 0)
-        .execute('Beca.sp_Get_Estado');
-      const estados = estadosResult.recordset;
-
-      const requisitosConNombres = requisitos.map(req => {
-        const estudianteId = Number(req.EstudianteId);
-        const estadoId = Number(req.EstadoId);
-
-        const estudiante = estudiantes.find(e => e.Id === estudianteId);
-        const estado = estados.find(e => e.Id === estadoId);
-
-        return {
-          ...req,
-          Estudiantenombre: estudiante?.Nombre ?? null,
-          Estadonombre: estado?.Nombre ?? null,
-        };
-      });
-
-      return requisitosConNombres;
-    } catch (e) {
-      console.error('Error al obtener los requisitos', JSON.stringify(e, null, 2));
-      return { error: 'Error al obtener los requisitos', detalle: e.message ?? e };
+  async update(id: number, dto: UpdateRequisitoDto): Promise<Requisito> {
+    // Validación básica
+    if (dto.Descripcion !== undefined && !dto.Descripcion?.trim()) {
+      throw new Error('La descripción no puede estar vacía');
     }
-  }
-
-  async findOne(id: number) {
-    try {
-      const pool = await this.sqlService.getConnection();
-
-      const requisitoResult: any = await pool
-        .request()
-        .input('Id', id)
-        .execute('Beca.sp_Get_Requisito');
-
-      if (requisitoResult.recordset.length === 0) {
-        return { mensaje: `Requisito con ID ${id} no encontrado` };
-      }
-
-      const requisito = requisitoResult.recordset[0];
-
-      const estudianteResult = await pool
-        .request()
-        .input('Id', Number(requisito.EstudianteId))
-        .execute('Beca.sp_Get_Estudiante');
-      const estudianteNombre = estudianteResult.recordset?.[0]
-        ? `${estudianteResult.recordset[0].Nombre} ${estudianteResult.recordset[0].Apellido}`
-        : null;
-
-      const estadoResult = await pool
-        .request()
-        .input('Id', Number(requisito.EstadoId))
-        .execute('Beca.sp_Get_Estado');
-      const estadoNombre = estadoResult.recordset?.[0]?.Nombre ?? null;
-
-      return {
-        ...requisito,
-        Estudiantenombre: estudianteNombre,
-        Estadonombre: estadoNombre,
-      };
-    } catch (e) {
-      console.error('Error al buscar el requisito por ID:', JSON.stringify(e, null, 2));
-      return { error: 'Error al buscar el requisito', detalle: e.message ?? e };
+    
+    if (dto.estadoId !== undefined && (!dto.estadoId || dto.estadoId <= 0)) {
+      throw new Error('El ID del estado debe ser válido');
     }
+
+    await this.requisitoRepository.update(id, dto);
+    const updatedRequisito = await this.requisitoRepository.findOne({ where: { id } });
+    if (!updatedRequisito) {
+      throw new Error(`Requisito con ID ${id} no encontrado`);
+    }
+    return updatedRequisito;
   }
 
-  async remove(id: number) {
-    try {
-      const pool = await this.sqlService.getConnection();
-
-      const requisitoResult: any = await pool
-        .request()
-        .input('Id', id)
-        .execute('Beca.sp_Get_Requisito');
-
-      if (requisitoResult.recordset.length === 0) {
-        return { mensaje: `Requisito con ID ${id} no encontrado` };
-      }
-
-      const requisito = requisitoResult.recordset[0];
-
-      const estudianteResult = await pool
-        .request()
-        .input('Id', Number(requisito.EstudianteId))
-        .execute('Beca.sp_Get_Estudiante');
-      const estudianteNombre = estudianteResult.recordset?.[0]
-        ? `${estudianteResult.recordset[0].Nombre} ${estudianteResult.recordset[0].Apellido}`
-        : null;
-
-      const estadoResult = await pool
-        .request()
-        .input('Id', Number(requisito.EstadoId))
-        .execute('Beca.sp_Get_Estado');
-      const estadoNombre = estadoResult.recordset?.[0]?.Nombre ?? null;
-
-      await pool
-        .request()
-        .input('Id', id)
-        .execute('Beca.sp_Delete_Requisito');
-
-      return {
-        mensaje: `Requisito con ID ${id} eliminado correctamente`,
-        requisito: {
-          ...requisito,
-          Estudiantenombre: estudianteNombre,
-          Estadonombre: estadoNombre,
-        },
-      };
-    } catch (e) {
-      console.error('Error al eliminar el requisito:', JSON.stringify(e, null, 2));
-      return {
-        error: 'Error al eliminar el requisito',
-        detalle: e.message ?? e,
-      };
+  async remove(id: number): Promise<void> {
+    const result = await this.requisitoRepository.delete(id);
+    if (result.affected === 0) {
+      throw new Error(`Requisito con ID ${id} no encontrado`);
     }
   }
 }

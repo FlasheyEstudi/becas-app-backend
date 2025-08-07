@@ -1,6 +1,6 @@
-export class CreateDetalle_requisitos_becaDto {
-  Id_Detalle?: number;
-  TipoBecaId?: number;   // Nuevo campo opcional
-  RequisitoId?: number;  // Nuevo campo opcional
-  
+// src/ms/Detalle_requisitos-beca/dto/create-detalle-requisitos-beca.dto.ts
+export class CreateDetalleRequisitosBecaDto {
+  Id?: number;
+  TipoBecaId?: number;
+  RequisitoId?: number;
 }

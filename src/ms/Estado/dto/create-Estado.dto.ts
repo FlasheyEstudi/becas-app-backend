@@ -1,5 +1,5 @@
 export class CreateEstadoDto {
   Id?: number;
-  Nombre: string;
+  nombre: string; // Cambiado de "Nombre" a "nombre"
   FechaRegistro: string;
 }
