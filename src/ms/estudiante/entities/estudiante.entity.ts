@@ -1,5 +1,6 @@
-// src/ms/estudiante/entities/estudiante.entity.ts
+// src/ms/Estudiante/entities/estudiante.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Documento } from '../../Documento/entities/documento.entity';
 import { SolicitudBeca } from '../../SolicitudBeca/entities/solicitud-beca.entity';
 
 @Entity()
@@ -11,21 +12,20 @@ export class Estudiante {
   nombre: string;
 
   @Column()
-  apellido: string;
+  apellidos: string;
 
   @Column()
-  edad: number;
-
-  @Column({ unique: true })
   correo: string;
 
-  @Column({ nullable: true })
+  @Column()
   estadoId: number;
 
-  @Column({ nullable: true })
+  @Column()
   carreraId: number;
 
-  // Relación inversa
-  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.estudiante)
-  solicitudesBeca: SolicitudBeca[];
+  @OneToMany(() => Documento, (documento) => documento.estudiante)
+  documentos: Documento[];
+
+  @OneToMany(() => SolicitudBeca, (solicitud) => solicitud.estudiante)
+  solicitudes: SolicitudBeca[];
 }

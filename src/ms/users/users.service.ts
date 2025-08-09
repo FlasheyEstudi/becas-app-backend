@@ -1,4 +1,4 @@
-// src/users/users.service.ts
+// src/ms/users/users.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -21,9 +21,8 @@ export class UsersService {
     return await this.usersRepository.save(user);
   }
 
-  async findOneByUsername(username: string): Promise<User | undefined> {
-    const user = await this.usersRepository.findOneBy({ username });
-    return user || undefined;
+  async findOneByUsername(username: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ username });
   }
 
   async validatePassword(password: string, hashedPassword: string): Promise<boolean> {

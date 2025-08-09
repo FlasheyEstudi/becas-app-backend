@@ -3,17 +3,23 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './ms/users/users.module'; // Correcto // Corregido
+import { UsersModule } from './ms/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EstudianteModule } from './ms/estudiante/estudiante.module';
 import { AreaConocimientoModule } from './ms/AreaConocimiento/AreaConocimiento.module';
-import { CarreraModule } from './ms/Carrera/carrera.module'; // Corregido: mayúscula y ruta correcta
+import { CarreraModule } from './ms/Carrera/carrera.module';
 import { RequisitoModule } from './ms/Requisito/Requisito.module';
 import { TipoBecaModule } from './ms/TipoBeca/TipoBeca.module';
 import { PeriodoAcademicoModule } from './ms/PeriodicoAcademico/PeriodoAcademico.module';
 import { SolicitudBecaModule } from './ms/SolicitudBeca/SolicitudBeca.module';
 import { EstadoModule } from './ms/Estado/Estado.module';
-import { Detalle_requisitos_becaModule } from './ms/Detalle_requisitos-beca/Detalle_requisitos_beca.module';
+import { DetalleRequisitosBecaModule} from './ms/Detalle_requisitos-beca/Detalle_requisitos_beca.module';
+import { DocumentoModule } from './ms/Documento/Documento.module';
+import { EvaluacionModule } from './ms/Evaluacion/Evaluacion.module';
+import { CriterioEvaluacionModule } from './ms/CriterioEvaluacion/CriterioEvaluacion.module';
+import { DetalleEvaluacionModule } from './ms/DetalleEvaluacion/DetalleEvaluacion.module';
+//import { NotificacionModule } from './ms/Notificacion/notificacion.module';
+import { AuditoriaModule } from './ms/Auditoria/Auditoria.module'
 
 @Module({
   imports: [
@@ -25,16 +31,22 @@ import { Detalle_requisitos_becaModule } from './ms/Detalle_requisitos-beca/Deta
       logging: false,
     }),
     AuthModule,
-    UsersModule, // Corregido
+    UsersModule,
     EstudianteModule,
     AreaConocimientoModule,
-    CarreraModule, // Corregido
+    CarreraModule,
     RequisitoModule,
     TipoBecaModule,
     PeriodoAcademicoModule,
     SolicitudBecaModule,
     EstadoModule,
-    Detalle_requisitos_becaModule
+   DetalleEvaluacionModule,
+    DocumentoModule,
+    EvaluacionModule,
+    CriterioEvaluacionModule,
+    DetalleEvaluacionModule,
+    //NotificacionModule,
+    AuditoriaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

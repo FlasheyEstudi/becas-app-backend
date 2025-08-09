@@ -1,4 +1,3 @@
-// src/ms/Requisito/Requisito.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,15 +13,6 @@ export class RequisitoService {
   ) {}
 
   async create(dto: CreateRequisitoDto): Promise<Requisito> {
-    // Validación básica
-    if (!dto.Descripcion?.trim()) {
-      throw new Error('La descripción es requerida');
-    }
-    
-    if (!dto.estadoId || dto.estadoId <= 0) {
-      throw new Error('El ID del estado es requerido y debe ser válido');
-    }
-
     const requisito = this.requisitoRepository.create(dto);
     return this.requisitoRepository.save(requisito);
   }
@@ -36,15 +26,6 @@ export class RequisitoService {
   }
 
   async update(id: number, dto: UpdateRequisitoDto): Promise<Requisito> {
-    // Validación básica
-    if (dto.Descripcion !== undefined && !dto.Descripcion?.trim()) {
-      throw new Error('La descripción no puede estar vacía');
-    }
-    
-    if (dto.estadoId !== undefined && (!dto.estadoId || dto.estadoId <= 0)) {
-      throw new Error('El ID del estado debe ser válido');
-    }
-
     await this.requisitoRepository.update(id, dto);
     const updatedRequisito = await this.requisitoRepository.findOne({ where: { id } });
     if (!updatedRequisito) {

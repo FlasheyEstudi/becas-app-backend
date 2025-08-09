@@ -1,5 +1,6 @@
 // src/ms/Requisito/entities/requisito.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { DetalleRequisitosBeca } from '../../Detalle_requisitos-beca/entities/detalle-requisitos-beca.entity';
 
 @Entity()
 export class Requisito {
@@ -7,12 +8,11 @@ export class Requisito {
   id: number;
 
   @Column()
-  Descripcion: string;
+  descripcion: string;
 
   @Column()
   estadoId: number;
-  
-  // Si necesitas el nombre del estado, puedes agregarlo como campo calculado
-  // pero no como columna en la base de datos necesariamente
-  estadoNombre?: string;
+
+  @OneToMany(() => DetalleRequisitosBeca, (detalleRequisitosBeca) => detalleRequisitosBeca.requisito)
+  detalleRequisitosBeca: DetalleRequisitosBeca[];
 }

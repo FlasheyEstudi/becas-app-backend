@@ -1,7 +1,18 @@
+// src/ms/TipoBeca/dto/create-TipoBeca.dto.ts
+import { IsNotEmpty, IsNumber, Min } from 'class-validator';
+
 export class CreateTipoBecaDto {
-  Id?: number;
-  nombre: string; // Cambiado de "Nombre" a "nombre"
-  Descripcion: string;
-  Monto: number;
-  EstadoId: number;
+  @IsNotEmpty()
+  nombre: string;
+
+  @IsNotEmpty()
+  descripcion: string;
+
+  @IsNumber()
+  @Min(0)
+  monto: number;
+
+  @IsNumber()
+  @Min(1)
+  estadoId: number;
 }

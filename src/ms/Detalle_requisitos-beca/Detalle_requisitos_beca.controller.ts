@@ -1,14 +1,13 @@
-// src/ms/Detalle_requisitos-beca/Detalle_requisitos_beca.controller.ts
 import { Controller, Post, Body, Get, Param, Delete, Put } from '@nestjs/common';
-import { Detalle_requisitos_becaService } from './Detalle_requisitos_beca.service';
-import { CreateDetalleRequisitosBecaDto } from './dto/create-Detalle-requisitos_beca.dto'; // Corregido
+import { DetalleRequisitosBecaService } from './Detalle_requisitos_beca.service';
+import { CreateDetalleRequisitosBecaDto } from './dto/create-Detalle-requisitos_beca.dto';
 
 @Controller('Detalle_requisitos_beca')
 export class Detalle_requisitos_becaController {
-  constructor(private readonly detalleRequisitosBecaService: Detalle_requisitos_becaService) {}
+  constructor(private readonly detalleRequisitosBecaService: DetalleRequisitosBecaService) {}
 
   @Post('/add')
-  create(@Body() dto: CreateDetalleRequisitosBecaDto) { // Corregido
+  create(@Body() dto: CreateDetalleRequisitosBecaDto) {
     return this.detalleRequisitosBecaService.create(dto);
   }
 
@@ -23,7 +22,7 @@ export class Detalle_requisitos_becaController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() dto: CreateDetalleRequisitosBecaDto) { // Corregido
+  update(@Param('id') id: string, @Body() dto: CreateDetalleRequisitosBecaDto) {
     return this.detalleRequisitosBecaService.update(Number(id), dto);
   }
 

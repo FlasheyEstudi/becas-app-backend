@@ -1,5 +1,9 @@
-// src/ms/Requisito/dto/create-requisito.dto.ts
+import { IsNotEmpty } from 'class-validator';
+
 export class CreateRequisitoDto {
-  Descripcion: string;
+  @IsNotEmpty()
+  descripcion: string;
+
+  @IsNotEmpty()
   estadoId: number;
 }

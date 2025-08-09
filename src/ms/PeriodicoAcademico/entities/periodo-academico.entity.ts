@@ -7,22 +7,21 @@ export class PeriodoAcademico {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column()
   nombre: string;
 
   @Column()
   anioAcademico: string;
 
   @Column()
-  fechaInicio: Date;
+  fechainicio: string;
 
   @Column()
-  fechaFin: Date;
+  fechafin: string;
 
-  @Column({ nullable: true })
+  @Column()
   estadoId: number;
 
-  // Relación inversa
-  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.periodoAcademico)
-  solicitudesBeca: SolicitudBeca[];
+  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.periodoAcademicoId) // Ajustado
+  solicitudes: SolicitudBeca[];
 }

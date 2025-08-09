@@ -7,13 +7,9 @@ export class Estado {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column()
   nombre: string;
 
-  @Column()
-  fechaRegistro: Date;
-
-  // Relación inversa
-  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.estado)
-  solicitudesBeca: SolicitudBeca[];
+  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.estadoId) // Cambiado a estadoId
+  solicitudes: SolicitudBeca[];
 }

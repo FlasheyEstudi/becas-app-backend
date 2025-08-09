@@ -1,23 +1,32 @@
 // src/ms/users/entities/user.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Auditoria } from '../../Auditoria/entities/auditoria.entity';
+//import { Notificacion } from '../../Notificacion/entities/notificacion.entity';
+import { Evaluacion } from '../../Evaluacion/entities/evaluacion.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column()
   username: string;
+
+  @Column()
+  nombre: string;
+
+  @Column()
+  email: string;
 
   @Column()
   password: string;
 
-  @Column()
-  firstName: string;
+  @OneToMany(() => Auditoria, (auditoria) => auditoria.usuario)
+  auditorias: Auditoria[];
 
-  @Column()
-  lastName: string;
+  //@OneToMany(() => Notificacion, (notificacion) => notificacion.usuario)
+  //notificaciones: Notificacion[];
 
-  @Column()
-  role: 'rector' | 'secretario' | 'profesor' | 'estudiante';
+  @OneToMany(() => Evaluacion, (evaluacion) => evaluacion.evaluador)
+  evaluaciones: Evaluacion[];
 }

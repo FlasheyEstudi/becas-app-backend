@@ -1,42 +1,41 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+// src/ms/SolicitudBeca/entities/solicitud-beca.entity.ts
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Estudiante } from '../../estudiante/entities/estudiante.entity';
 import { TipoBeca } from '../../TipoBeca/entities/tipo-beca.entity';
-import { Estado } from '../../Estado/entities/estado.entity';
-import { PeriodoAcademico } from '../../PeriodicoAcademico/entities/periodo-academico.entity';
+import { Evaluacion } from '../../Evaluacion/entities/evaluacion.entity';
 
 @Entity()
 export class SolicitudBeca {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Estudiante, (estudiante) => estudiante.solicitudesBeca, { nullable: false })
-  @JoinColumn({ name: 'estudianteId' })
+  @ManyToOne(() => Estudiante, (estudiante) => estudiante.solicitudes)
   estudiante: Estudiante;
 
-  @ManyToOne(() => TipoBeca, (tipoBeca) => tipoBeca.solicitudesBeca, { nullable: false })
-  @JoinColumn({ name: 'tipoBecaId' })
+  @Column()
+  estudianteId: number;
+
+  @ManyToOne(() => TipoBeca, (tipoBeca) => tipoBeca.solicitudes)
   tipoBeca: TipoBeca;
 
-  @ManyToOne(() => Estado, (estado) => estado.solicitudesBeca, { nullable: false })
-  @JoinColumn({ name: 'estadoId' })
-  estado: Estado;
+  @Column()
+  tipoBecaId: number;
 
-  @Column({ name: 'fechaSolicitud' })
+  @Column()
+  estadoId: number;
+
+  @Column({ nullable: true })
+  periodoAcademicoId: number; // Nueva columna
+
+  @Column({ nullable: true })
   fechaSolicitud: Date;
 
-  @ManyToOne(() => PeriodoAcademico, (periodoAcademico) => periodoAcademico.solicitudesBeca, { nullable: false })
-  @JoinColumn({ name: 'periodoAcademicoId' })
-  periodoAcademico: PeriodoAcademico;
-
-  @Column({ name: 'observaciones' })
+  @Column({ nullable: true })
   observaciones: string;
 
-  @Column({ name: 'fechaResultado', nullable: true })
+  @Column({ nullable: true })
   fechaResultado: Date;
+
+  @OneToMany(() => Evaluacion, (evaluacion) => evaluacion.solicitud)
+  evaluaciones: Evaluacion[];
 }

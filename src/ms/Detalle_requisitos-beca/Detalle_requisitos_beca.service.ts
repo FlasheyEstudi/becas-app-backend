@@ -1,40 +1,94 @@
-// src/ms/Detalle_requisitos-beca/Detalle_requisitos_beca.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DetalleRequisitosBeca } from './entities/detalle-requisitos-beca.entity';
 import { CreateDetalleRequisitosBecaDto } from './dto/create-Detalle-requisitos_beca.dto';
+import { TipoBeca } from '../TipoBeca/entities/tipo-beca.entity'; // Importar entidad TipoBeca
+import { Requisito } from '../Requisito/entities/requisito.entity'; // Importar entidad Requisito
 
 @Injectable()
-export class Detalle_requisitos_becaService {
+export class DetalleRequisitosBecaService {
   constructor(
     @InjectRepository(DetalleRequisitosBeca)
-    private detalleRequisitosBecaRepository: Repository<DetalleRequisitosBeca>,
+    private readonly detalleRequisitosBecaRepository: Repository<DetalleRequisitosBeca>,
+    @InjectRepository(TipoBeca)
+    private readonly tipoBecaRepository: Repository<TipoBeca>, // Repositorio para TipoBeca
+    @InjectRepository(Requisito)
+    private readonly requisitoRepository: Repository<Requisito>, // Repositorio para Requisito
   ) {}
 
-  async create(dto: CreateDetalleRequisitosBecaDto): Promise<DetalleRequisitosBeca> {
-    const detalleRequisitosBeca = this.detalleRequisitosBecaRepository.create(dto);
-    return this.detalleRequisitosBecaRepository.save(detalleRequisitosBeca);
-  }
+  async create(createDto: CreateDetalleRequisitosBecaDto): Promise<DetalleRequisitosBeca> {
+    // Obtener las entidades completas para las relaciones
+    const tipoBeca = await this.tipoBecaRepository.findOne({
+      where: { id: createDto.tipoBecaId }
+    });
+    const requisito = await this.requisitoRepository.findOne({
+      where: { id: createDto.requisitoId }
+    });
 
-  findAll(): Promise<DetalleRequisitosBeca[]> {
-    return this.detalleRequisitosBecaRepository.find();
-  }
-
-  async findOne(id: number): Promise<DetalleRequisitosBeca | null> {
-    return this.detalleRequisitosBecaRepository.findOne({ where: { id } });
-  }
-
-  async update(id: number, dto: CreateDetalleRequisitosBecaDto): Promise<DetalleRequisitosBeca> {
-    await this.detalleRequisitosBecaRepository.update(id, dto);
-    const updatedDetalle = await this.detalleRequisitosBecaRepository.findOne({ where: { id } });
-    if (!updatedDetalle) {
-      throw new Error(`DetalleRequisitosBeca with ID ${id} not found`);
+    if (!tipoBeca || !requisito) {
+      throw new NotFoundException('TipoBeca o Requisito no encontrado');
     }
-    return updatedDetalle;
+
+    const nuevoDetalle = this.detalleRequisitosBecaRepository.create({
+      tipoBeca,
+      requisito
+    });
+
+    return await this.detalleRequisitosBecaRepository.save(nuevoDetalle);
+  }
+
+  async findAll(): Promise<DetalleRequisitosBeca[]> {
+    return this.detalleRequisitosBecaRepository.find({
+      relations: ['tipoBeca', 'requisito']
+    });
+  }
+
+  async findOne(id: number): Promise<DetalleRequisitosBeca> {
+    const detalle = await this.detalleRequisitosBecaRepository.findOne({
+      where: { id_detalle: id },
+      relations: ['tipoBeca', 'requisito']
+    });
+    
+    if (!detalle) {
+      throw new NotFoundException(`Detalle con ID ${id} no encontrado`);
+    }
+    
+    return detalle;
+  }
+
+  async update(id: number, updateDto: CreateDetalleRequisitosBecaDto): Promise<DetalleRequisitosBeca> {
+    const detalle = await this.detalleRequisitosBecaRepository.findOne({
+      where: { id_detalle: id }
+    });
+    
+    if (!detalle) {
+      throw new NotFoundException(`Detalle con ID ${id} no encontrado`);
+    }
+
+    // Obtener las entidades completas para las relaciones
+    const tipoBeca = await this.tipoBecaRepository.findOne({
+      where: { id: updateDto.tipoBecaId }
+    });
+    const requisito = await this.requisitoRepository.findOne({
+      where: { id: updateDto.requisitoId }
+    });
+
+    if (!tipoBeca || !requisito) {
+      throw new NotFoundException('TipoBeca o Requisito no encontrado');
+    }
+
+    // Actualizar las relaciones con las entidades completas
+    detalle.tipoBeca = tipoBeca;
+    detalle.requisito = requisito;
+
+    return this.detalleRequisitosBecaRepository.save(detalle);
   }
 
   async remove(id: number): Promise<void> {
-    await this.detalleRequisitosBecaRepository.delete(id);
+    const result = await this.detalleRequisitosBecaRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Detalle con ID ${id} no encontrado`);
+    }
   }
 }

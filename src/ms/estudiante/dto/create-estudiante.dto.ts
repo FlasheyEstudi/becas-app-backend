@@ -1,7 +1,7 @@
 export class CreateEstudianteDto {
   Id?: number;
   nombre: string;
-  apellido: string;
+  apellidos: string;
   edad: number;
   correo: string;
   EstadoId?: number;
