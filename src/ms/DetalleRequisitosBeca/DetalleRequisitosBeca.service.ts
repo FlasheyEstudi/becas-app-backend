@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DetalleRequisitosBeca } from './entities/detalle-requisitos-beca.entity';
 import { CreateDetalleRequisitosBecaDto } from './dto/create-Detalle-requisitos_beca.dto';
-import { TipoBeca } from '../TipoBeca/entities/tipo-beca.entity'; // Importar entidad TipoBeca
-import { Requisito } from '../Requisito/entities/requisito.entity'; // Importar entidad Requisito
+import { TipoBeca } from '../TipoBeca/entities/tipo-beca.entity';
+import { Requisito } from '../Requisito/entities/requisito.entity';
 
 @Injectable()
 export class DetalleRequisitosBecaService {
@@ -12,18 +12,17 @@ export class DetalleRequisitosBecaService {
     @InjectRepository(DetalleRequisitosBeca)
     private readonly detalleRequisitosBecaRepository: Repository<DetalleRequisitosBeca>,
     @InjectRepository(TipoBeca)
-    private readonly tipoBecaRepository: Repository<TipoBeca>, // Repositorio para TipoBeca
+    private readonly tipoBecaRepository: Repository<TipoBeca>,
     @InjectRepository(Requisito)
-    private readonly requisitoRepository: Repository<Requisito>, // Repositorio para Requisito
-  ) {}
+    private readonly requisitoRepository: Repository<Requisito>,
+  ) { }
 
   async create(createDto: CreateDetalleRequisitosBecaDto): Promise<DetalleRequisitosBeca> {
-    // Obtener las entidades completas para las relaciones
     const tipoBeca = await this.tipoBecaRepository.findOne({
-      where: { id: createDto.tipoBecaId }
+      where: { id: createDto.tipoBecaId },
     });
     const requisito = await this.requisitoRepository.findOne({
-      where: { id: createDto.requisitoId }
+      where: { id: createDto.requisitoId },
     });
 
     if (!tipoBeca || !requisito) {
@@ -32,7 +31,7 @@ export class DetalleRequisitosBecaService {
 
     const nuevoDetalle = this.detalleRequisitosBecaRepository.create({
       tipoBeca,
-      requisito
+      requisito,
     });
 
     return await this.detalleRequisitosBecaRepository.save(nuevoDetalle);
@@ -40,45 +39,43 @@ export class DetalleRequisitosBecaService {
 
   async findAll(): Promise<DetalleRequisitosBeca[]> {
     return this.detalleRequisitosBecaRepository.find({
-      relations: ['tipoBeca', 'requisito']
+      relations: ['tipoBeca', 'requisito'],
     });
   }
 
   async findOne(id: number): Promise<DetalleRequisitosBeca> {
     const detalle = await this.detalleRequisitosBecaRepository.findOne({
       where: { id_detalle: id },
-      relations: ['tipoBeca', 'requisito']
+      relations: ['tipoBeca', 'requisito'],
     });
-    
+
     if (!detalle) {
       throw new NotFoundException(`Detalle con ID ${id} no encontrado`);
     }
-    
+
     return detalle;
   }
 
   async update(id: number, updateDto: CreateDetalleRequisitosBecaDto): Promise<DetalleRequisitosBeca> {
     const detalle = await this.detalleRequisitosBecaRepository.findOne({
-      where: { id_detalle: id }
+      where: { id_detalle: id },
     });
-    
+
     if (!detalle) {
       throw new NotFoundException(`Detalle con ID ${id} no encontrado`);
     }
 
-    // Obtener las entidades completas para las relaciones
     const tipoBeca = await this.tipoBecaRepository.findOne({
-      where: { id: updateDto.tipoBecaId }
+      where: { id: updateDto.tipoBecaId },
     });
     const requisito = await this.requisitoRepository.findOne({
-      where: { id: updateDto.requisitoId }
+      where: { id: updateDto.requisitoId },
     });
 
     if (!tipoBeca || !requisito) {
       throw new NotFoundException('TipoBeca o Requisito no encontrado');
     }
 
-    // Actualizar las relaciones con las entidades completas
     detalle.tipoBeca = tipoBeca;
     detalle.requisito = requisito;
 

@@ -1,8 +1,12 @@
-// src/ms/TipoBeca/entities/tipo-beca.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+} from 'typeorm';
 import { CriterioEvaluacion } from '../../CriterioEvaluacion/entities/criterio-evaluacion.entity';
 import { SolicitudBeca } from '../../SolicitudBeca/entities/solicitud-beca.entity';
-import { DetalleRequisitosBeca } from '../../Detalle_requisitos-beca/entities/detalle-requisitos-beca.entity';
+import { DetalleRequisitosBeca } from '../../DetalleRequisitosBeca/entities/detalle-requisitos-beca.entity';
 
 @Entity()
 export class TipoBeca {
@@ -15,6 +19,13 @@ export class TipoBeca {
   @Column()
   descripcion: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false, default: 0 })
+  monto: number;
+
+  @Column({ type: 'int', nullable: false, default: 1 })
+  estadoId: number;
+
+  /* relaciones */
   @OneToMany(() => CriterioEvaluacion, (criterioEvaluacion) => criterioEvaluacion.tipoBeca)
   criteriosEvaluacion: CriterioEvaluacion[];
 

@@ -1,6 +1,6 @@
 // src/ms/Requisito/entities/requisito.entity.ts
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { DetalleRequisitosBeca } from '../../Detalle_requisitos-beca/entities/detalle-requisitos-beca.entity';
+import { DetalleRequisitosBeca } from '../../DetalleRequisitosBeca/entities/detalle-requisitos-beca.entity';
 
 @Entity()
 export class Requisito {

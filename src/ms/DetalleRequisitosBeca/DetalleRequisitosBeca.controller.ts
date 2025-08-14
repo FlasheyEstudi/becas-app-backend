@@ -1,12 +1,12 @@
 import { Controller, Post, Body, Get, Param, Delete, Put } from '@nestjs/common';
-import { DetalleRequisitosBecaService } from './Detalle_requisitos_beca.service';
+import { DetalleRequisitosBecaService } from './DetalleRequisitosBeca.service';
 import { CreateDetalleRequisitosBecaDto } from './dto/create-Detalle-requisitos_beca.dto';
 
-@Controller('Detalle_requisitos_beca')
-export class Detalle_requisitos_becaController {
-  constructor(private readonly detalleRequisitosBecaService: DetalleRequisitosBecaService) {}
+@Controller('detalle-requisitos-beca')  // nombre ruta en minúsculas y con guion bajo
+export class DetalleRequisitosBecaController {
+  constructor(private readonly detalleRequisitosBecaService: DetalleRequisitosBecaService) { }
 
-  @Post('/add')
+  @Post('add')
   create(@Body() dto: CreateDetalleRequisitosBecaDto) {
     return this.detalleRequisitosBecaService.create(dto);
   }

@@ -10,6 +10,6 @@ export class Estado {
   @Column()
   nombre: string;
 
-  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.estadoId) // Cambiado a estadoId
+  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.estado) // Corregido
   solicitudes: SolicitudBeca[];
 }

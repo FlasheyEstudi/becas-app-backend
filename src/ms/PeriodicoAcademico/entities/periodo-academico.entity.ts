@@ -22,6 +22,6 @@ export class PeriodoAcademico {
   @Column()
   estadoId: number;
 
-  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.periodoAcademicoId) // Ajustado
+  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.periodoAcademico) // Corregido
   solicitudes: SolicitudBeca[];
 }

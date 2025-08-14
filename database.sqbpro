@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="database.sqlite" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2017"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="estado" custom_title="0" dock_id="1" table="4,6:mainestado"/><dock_state state="000000ff00000000fd00000001000000020000000000000000fc0100000001fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000013900ffffff000000000000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1*">PRAGMA foreign_keys = OFF;
+
+
+-- Tabla area_conocimiento con clave primaria y unique
+CREATE TABLE IF NOT EXISTS &quot;area_conocimiento&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;nombre&quot; VARCHAR NOT NULL UNIQUE
+);
+
+-- Tabla carrera con FK a area_conocimiento
+CREATE TABLE IF NOT EXISTS &quot;carrera&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;nombre&quot; VARCHAR NOT NULL UNIQUE,
+  &quot;areaConocimientoId&quot; INTEGER NOT NULL,
+  FOREIGN KEY (&quot;areaConocimientoId&quot;) REFERENCES &quot;area_conocimiento&quot;(&quot;id&quot;)
+);
+
+-- Tabla criterio_evaluacion con FK a tipo_beca (nullable)
+CREATE TABLE IF NOT EXISTS &quot;criterio_evaluacion&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;nombre&quot; VARCHAR NOT NULL,
+  &quot;descripcion&quot; VARCHAR,
+  &quot;peso&quot; INTEGER NOT NULL,
+  &quot;tipoBecaId&quot; INTEGER,
+  FOREIGN KEY (&quot;tipoBecaId&quot;) REFERENCES &quot;tipo_beca&quot;(&quot;id&quot;)
+);
+
+-- Tabla detalle_evaluacion con FK a evaluacion y criterio_evaluacion
+CREATE TABLE IF NOT EXISTS &quot;detalle_evaluacion&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;evaluacionId&quot; INTEGER NOT NULL,
+  &quot;criterioId&quot; INTEGER NOT NULL,
+  &quot;puntuacion&quot; INTEGER NOT NULL,
+  &quot;comentarios&quot; VARCHAR,
+  FOREIGN KEY (&quot;evaluacionId&quot;) REFERENCES &quot;evaluacion&quot;(&quot;id&quot;),
+  FOREIGN KEY (&quot;criterioId&quot;) REFERENCES &quot;criterio_evaluacion&quot;(&quot;id&quot;)
+);
+
+-- Tabla detalle_requisitos_beca con FK a tipo_beca y requisito
+CREATE TABLE IF NOT EXISTS &quot;detalle_requisitos_beca&quot; (
+  &quot;id_detalle&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;tipoBecaId&quot; INTEGER,
+  &quot;requisitoId&quot; INTEGER,
+  FOREIGN KEY (&quot;tipoBecaId&quot;) REFERENCES &quot;tipo_beca&quot;(&quot;id&quot;),
+  FOREIGN KEY (&quot;requisitoId&quot;) REFERENCES &quot;requisito&quot;(&quot;id&quot;)
+);
+
+-- Tabla documento con FK a estudiante
+CREATE TABLE IF NOT EXISTS &quot;documento&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;nombre&quot; VARCHAR NOT NULL,
+  &quot;url&quot; VARCHAR NOT NULL,
+  &quot;estudianteId&quot; INTEGER NOT NULL,
+  FOREIGN KEY (&quot;estudianteId&quot;) REFERENCES &quot;estudiante&quot;(&quot;id&quot;)
+);
+
+-- Tabla estado
+CREATE TABLE IF NOT EXISTS &quot;estado&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;nombre&quot; VARCHAR NOT NULL
+);
+
+-- Tabla estudiante con FK a estado y carrera
+CREATE TABLE IF NOT EXISTS &quot;estudiante&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;nombre&quot; VARCHAR NOT NULL,
+  &quot;apellido&quot; VARCHAR NOT NULL,
+  &quot;correo&quot; VARCHAR NOT NULL,
+  &quot;estadoId&quot; INTEGER NOT NULL,
+  &quot;carreraId&quot; INTEGER NOT NULL,
+  FOREIGN KEY (&quot;estadoId&quot;) REFERENCES &quot;estado&quot;(&quot;id&quot;),
+  FOREIGN KEY (&quot;carreraId&quot;) REFERENCES &quot;carrera&quot;(&quot;id&quot;)
+);
+
+-- Tabla evaluacion con FK a solicitud_beca y user (evaluador)
+CREATE TABLE IF NOT EXISTS &quot;evaluacion&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;solicitudId&quot; INTEGER NOT NULL,
+  &quot;evaluadorId&quot; INTEGER NOT NULL,
+  &quot;puntuacionTotal&quot; INTEGER NOT NULL,
+  &quot;comentarios&quot; VARCHAR,
+  &quot;recomendacion&quot; VARCHAR,
+  &quot;fechaEvaluacion&quot; DATETIME,
+  FOREIGN KEY (&quot;solicitudId&quot;) REFERENCES &quot;solicitud_beca&quot;(&quot;id&quot;),
+  FOREIGN KEY (&quot;evaluadorId&quot;) REFERENCES &quot;user&quot;(&quot;id&quot;)
+);
+
+-- Tabla periodo_academico con FK a estado
+CREATE TABLE IF NOT EXISTS &quot;periodo_academico&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;nombre&quot; VARCHAR NOT NULL,
+  &quot;anioAcademico&quot; VARCHAR NOT NULL,
+  &quot;fechainicio&quot; VARCHAR NOT NULL,
+  &quot;fechafin&quot; VARCHAR NOT NULL,
+  &quot;estadoId&quot; INTEGER NOT NULL,
+  FOREIGN KEY (&quot;estadoId&quot;) REFERENCES &quot;estado&quot;(&quot;id&quot;)
+);
+
+-- Tabla requisito con FK a estado
+CREATE TABLE IF NOT EXISTS &quot;requisito&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;descripcion&quot; VARCHAR NOT NULL,
+  &quot;estadoId&quot; INTEGER NOT NULL,
+  FOREIGN KEY (&quot;estadoId&quot;) REFERENCES &quot;estado&quot;(&quot;id&quot;)
+);
+
+-- Tabla solicitud_beca con FK a estudiante, tipo_beca, estado y periodo_academico
+CREATE TABLE IF NOT EXISTS &quot;solicitud_beca&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;estudianteId&quot; INTEGER NOT NULL,
+  &quot;tipoBecaId&quot; INTEGER NOT NULL,
+  &quot;estadoId&quot; INTEGER NOT NULL,
+  &quot;periodoAcademicoId&quot; INTEGER NOT NULL,
+  &quot;fechaSolicitud&quot; DATETIME NOT NULL,
+  &quot;observaciones&quot; VARCHAR,
+  &quot;fechaResultado&quot; DATETIME,
+  FOREIGN KEY (&quot;estudianteId&quot;) REFERENCES &quot;estudiante&quot;(&quot;id&quot;),
+  FOREIGN KEY (&quot;tipoBecaId&quot;) REFERENCES &quot;tipo_beca&quot;(&quot;id&quot;),
+  FOREIGN KEY (&quot;estadoId&quot;) REFERENCES &quot;estado&quot;(&quot;id&quot;),
+  FOREIGN KEY (&quot;periodoAcademicoId&quot;) REFERENCES &quot;periodo_academico&quot;(&quot;id&quot;)
+);
+
+-- Tabla tipo_beca con FK a estado
+CREATE TABLE IF NOT EXISTS &quot;tipo_beca&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;nombre&quot; VARCHAR NOT NULL,
+  &quot;descripcion&quot; VARCHAR NOT NULL,
+  &quot;monto&quot; DECIMAL(10,2) NOT NULL DEFAULT (0),
+  &quot;estadoId&quot; INTEGER NOT NULL DEFAULT (1),
+  FOREIGN KEY (&quot;estadoId&quot;) REFERENCES &quot;estado&quot;(&quot;id&quot;)
+);
+
+-- Tabla user
+CREATE TABLE IF NOT EXISTS &quot;user&quot; (
+  &quot;id&quot; INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  &quot;username&quot; VARCHAR NOT NULL UNIQUE,
+  &quot;nombre&quot; VARCHAR NOT NULL,
+  &quot;apellidos&quot; TEXT,
+  &quot;email&quot; VARCHAR NOT NULL UNIQUE,
+  &quot;password&quot; VARCHAR NOT NULL,
+  &quot;role&quot; VARCHAR NOT NULL DEFAULT ('estudiante')
+);
+
+-- Inserciones con ON CONFLICT para no duplicar y actualizar
+
+-- area_conocimiento
+INSERT INTO &quot;area_conocimiento&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES 
+(1,'Ciencias Exactas'),
+(2,'Ciencias Sociales'),
+(3,'Humanidades'),
+(4,'Ingenierías'),
+(5,'Arte y Diseño'),
+(6,'Ciencias de la Salud')
+ON CONFLICT(id) DO UPDATE SET nombre=excluded.nombre;
+
+-- carrera
+INSERT INTO &quot;carrera&quot; (&quot;id&quot;,&quot;nombre&quot;,&quot;areaConocimientoId&quot;) VALUES
+(1,'Ingeniería en Sistemas',4),
+(2,'Medicina',6),
+(3,'Derecho',2),
+(4,'Psicología',2),
+(5,'Arquitectura',4),
+(6,'Literatura',3),
+(7,'Matemáticas',1),
+(8,'Biología',1),
+(9,'Administración',2),
+(10,'Diseño Gráfico',5)
+ON CONFLICT(id) DO UPDATE SET nombre=excluded.nombre, areaConocimientoId=excluded.areaConocimientoId;
+
+-- criterio_evaluacion
+INSERT INTO &quot;criterio_evaluacion&quot; (&quot;id&quot;,&quot;nombre&quot;,&quot;descripcion&quot;,&quot;peso&quot;,&quot;tipoBecaId&quot;) VALUES
+(1,'Rendimiento académico','Evaluación del promedio y desempeño',40,1),
+(2,'Necesidad económica','Evaluación de la situación financiera',30,2),
+(3,'Calidad del proyecto','Originalidad y viabilidad del proyecto',50,3),
+(4,'Rendimiento deportivo','Logros y participaciones en competencias',45,4),
+(5,'Creatividad y originalidad','Calidad artística y creatividad',40,5),
+(6,'Idioma y preparación','Nivel de idioma y preparación cultural',35,6),
+(7,'Documentación completa','Verificación de documentos requeridos',20,NULL),
+(8,'Recomendaciones','Calidad de cartas de recomendación',15,NULL)
+ON CONFLICT(id) DO UPDATE SET nombre=excluded.nombre, descripcion=excluded.descripcion, peso=excluded.peso, tipoBecaId=excluded.tipoBecaId;
+
+-- detalle_evaluacion
+INSERT INTO &quot;detalle_evaluacion&quot; (&quot;id&quot;,&quot;evaluacionId&quot;,&quot;criterioId&quot;,&quot;puntuacion&quot;,&quot;comentarios&quot;) VALUES
+(1,1,1,95,'Promedio de 9.5 con materias destacadas'),
+(2,1,7,90,'Documentación completa y en orden'),
+(3,1,8,92,'Excelentes cartas de recomendación'),
+(4,2,1,80,'Promedio de 8.5 aceptable'),
+(5,2,2,90,'Comprobantes de ingresos claros'),
+(6,2,7,85,'Documentación completa'),
+(7,3,1,75,'Promedio de 8.0 justo'),
+(8,3,3,85,'Proyecto viable pero con aspectos por mejorar'),
+(9,3,8,75,'Carta de motivación regular'),
+(10,4,1,80,'Promedio académico aceptable'),
+(11,4,4,95,'Excelente rendimiento en competencias'),
+(12,4,7,90,'Documentación completa'),
+(13,5,1,85,'Buen promedio académico'),
+(14,5,5,80,'Obra artística creativa'),
+(15,5,7,82,'Documentación en orden'),
+(16,6,1,90,'Excelente promedio'),
+(17,6,6,95,'Nivel de alemán B2'),
+(18,6,8,85,'Carta de motivación sólida'),
+(19,8,1,75,'Promedio de 8.0'),
+(20,8,2,85,'Comprobantes claros'),
+(21,8,7,68,'Algunos documentos incompletos'),
+(22,9,1,90,'Buen promedio'),
+(23,9,3,100,'Proyecto innovador y bien documentado'),
+(24,9,8,95,'Excelente carta de motivación'),
+(25,10,1,75,'Promedio aceptable'),
+(26,10,4,85,'Buen rendimiento deportivo'),
+(27,10,7,80,'Documentación completa')
+ON CONFLICT(id) DO UPDATE SET evaluacionId=excluded.evaluacionId, criterioId=excluded.criterioId, puntuacion=excluded.puntuacion, comentarios=excluded.comentarios;
+
+-- detalle_requisitos_beca
+INSERT INTO &quot;detalle_requisitos_beca&quot; (&quot;id_detalle&quot;,&quot;tipoBecaId&quot;,&quot;requisitoId&quot;) VALUES
+(1,1,1),(2,1,2),(3,1,3),(4,2,1),(5,2,4),(6,2,5),(7,2,6),(8,3,1),(9,3,8),(10,3,9),
+(11,4,1),(12,4,10),(13,5,1),(14,5,7),(15,5,8),(16,6,1),(17,6,8),(18,6,10)
+ON CONFLICT(id_detalle) DO UPDATE SET tipoBecaId=excluded.tipoBecaId, requisitoId=excluded.requisitoId;
+
+-- documento
+INSERT INTO &quot;documento&quot; (&quot;id&quot;,&quot;nombre&quot;,&quot;url&quot;,&quot;estudianteId&quot;) VALUES
+(1,'Acta de nacimiento Carlos','/docs/acta_nacimiento_carlos.pdf',1),
+(2,'Comprobante de ingresos Carlos','/docs/ingresos_carlos.pdf',1),
+(3,'Carta de recomendación Carlos','/docs/recomendacion_carlos.pdf',1),
+(4,'Identificación Ana','/docs/identificacion_ana.pdf',2),
+(5,'Constancia de no adeudo Ana','/docs/no_adeudo_ana.pdf',2),
+(6,'Acta de nacimiento Pedro','/docs/acta_nacimiento_pedro.pdf',3),
+(7,'Proyecto investigación Pedro','/docs/proyecto_pedro.pdf',3),
+(8,'Fotografía Laura','/docs/foto_laura.jpg',4),
+(9,'Comprobante domicilio Laura','/docs/domicilio_laura.pdf',4),
+(10,'Constancia no adeudo Miguel','/docs/no_adeudo_miguel.pdf',5)
+ON CONFLICT(id) DO UPDATE SET nombre=excluded.nombre, url=excluded.url, estudianteId=excluded.estudianteId;
+
+-- estado
+INSERT INTO &quot;estado&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES
+(1,'Activo'),(2,'Inactivo'),(3,'Pendiente'),(4,'Aprobado'),(5,'Rechazado'),(6,'En evaluación'),(7,'Finalizado')
+ON CONFLICT(id) DO UPDATE SET nombre=excluded.nombre;
+
+-- estudiante
+INSERT INTO &quot;estudiante&quot; (&quot;id&quot;,&quot;nombre&quot;,&quot;apellido&quot;,&quot;correo&quot;,&quot;estadoId&quot;,&quot;carreraId&quot;) VALUES
+(1,'Carlos','Ruiz Martínez','carlos.ruiz@estudiante.edu',1,1),
+(2,'Ana','López Sánchez','ana.lopez@estudiante.edu',1,2),
+(3,'Pedro','González Ramírez','pedro.gonzalez@estudiante.edu',1,3),
+(4,'Laura','Fernández Díaz','laura.fernandez@estudiante.edu',1,4),
+(5,'Miguel','Sánchez Torres','miguel.sanchez@estudiante.edu',1,5),
+(6,'Sofía','Jiménez López','sofia.jimenez@estudiante.edu',1,6),
+(7,'Javier','Martínez García','javier.martinez@estudiante.edu',1,7),
+(8,'Elena','Ruiz Sánchez','elena.ruiz@estudiante.edu',1,8),
+(9,'David','González Fernández','david.gonzalez@estudiante.edu',1,9),
+(10,'Isabel','López Ramírez','isabel.lopez@estudiante.edu',1,10)
+ON CONFLICT(id) DO UPDATE SET nombre=excluded.nombre, apellido=excluded.apellido, correo=excluded.correo, estadoId=excluded.estadoId, carreraId=excluded.carreraId;
+
+-- evaluacion (incluye la que faltaba ID 7)
+INSERT INTO &quot;evaluacion&quot; (&quot;id&quot;,&quot;solicitudId&quot;,&quot;evaluadorId&quot;,&quot;puntuacionTotal&quot;,&quot;comentarios&quot;,&quot;recomendacion&quot;,&quot;fechaEvaluacion&quot;) VALUES
+(1,1,2,92,'Excelente estudiante con alto rendimiento','Aprobar','2025-03-05'),
+(2,2,3,85,'Necesidad económica justificada','Aprobar','2025-03-08'),
+(3,3,2,78,'Proyecto interesante pero mejorable','Aprobar con condiciones','2025-03-10'),
+(4,4,3,88,'Buen atleta con potencial','Aprobar','2025-03-12'),
+(5,5,2,82,'Obra artística de calidad','Aprobar','2025-03-14'),
+(6,6,3,90,'Preparado para intercambio','Aprobar','2025-03-16'),
+(7,7,3,65,'No cumple requisitos mínimos','Rechazar','2025-03-18'),
+(8,8,2,76,'Documentación completa pero promedio justo','Aprobar','2025-03-20'),
+(9,9,3,95,'Proyecto innovador y bien planteado','Aprobar','2025-03-22'),
+(10,10,2,80,'Buen rendimiento deportivo','Aprobar','2025-03-25')
+ON CONFLICT(id) DO UPDATE SET solicitudId=excluded.solicitudId, evaluadorId=excluded.evaluadorId, puntuacionTotal=excluded.puntuacionTotal, comentarios=excluded.comentarios, recomendacion=excluded.recomendacion, fechaEvaluacion=excluded.fechaEvaluacion;
+
+-- periodo_academico
+INSERT INTO &quot;periodo_academico&quot; (&quot;id&quot;,&quot;nombre&quot;,&quot;anioAcademico&quot;,&quot;fechainicio&quot;,&quot;fechafin&quot;,&quot;estadoId&quot;) VALUES
+(1,'2025-I','2025','2025-01-15','2025-06-30',1),
+(2,'2025-II','2025','2025-07-15','2025-12-15',1),
+(3,'2024-II','2024','2024-07-15','2024-12-15',7),
+(4,'2024-I','2024','2024-01-15','2024-06-30',7)
+ON CONFLICT(id) DO UPDATE SET nombre=excluded.nombre, anioAcademico=excluded.anioAcademico, fechainicio=excluded.fechainicio, fechafin=excluded.fechafin, estadoId=excluded.estadoId;
+
+-- requisito
+INSERT INTO &quot;requisito&quot; (&quot;id&quot;,&quot;descripcion&quot;,&quot;estadoId&quot;) VALUES
+(1,'Promedio mínimo de 8.0',1),
+(2,'Carta de recomendación',1),
+(3,'Constancia de no adeudo',1),
+(4,'Comprobante de ingresos',1),
+(5,'Acta de nacimiento',1),
+(6,'Identificación oficial',1),
+(7,'Comprobante de domicilio',1),
+(8,'Fotografía reciente',1),
+(9,'Carta de motivación',1),
+(10,'Proyecto de investigación',1)
+ON CONFLICT(id) DO UPDATE SET descripcion=excluded.descripcion, estadoId=excluded.estadoId;
+
+-- solicitud_beca
+INSERT INTO &quot;solicitud_beca&quot; (&quot;id&quot;,&quot;estudianteId&quot;,&quot;tipoBecaId&quot;,&quot;estadoId&quot;,&quot;periodoAcademicoId&quot;,&quot;fechaSolicitud&quot;,&quot;observaciones&quot;,&quot;fechaResultado&quot;) VALUES
+(1,1,1,4,1,'2025-02-15','Excelente estudiante con proyectos destacados','2025-03-10'),
+(2,2,2,4,1,'2025-02-18','Necesidad económica demostrada','2025-03-12'),
+(3,3,3,6,1,'2025-02-20','Proyecto de investigación en IA','2025-03-15'),
+(4,4,4,6,1,'2025-02-22','Atleta universitario','2025-03-18'),
+(5,5,5,6,1,'2025-02-25','Exposición de arte ganadora','2025-03-20'),
+(6,6,6,6,1,'2025-02-28','Programa de intercambio en Alemania','2025-03-22'),
+(7,7,1,5,1,'2025-03-01','No cumple con el promedio mínimo','2025-03-25'),
+(8,8,2,3,1,'2025-03-03','Documentación en proceso','2025-03-27'),
+(9,9,3,4,1,'2025-03-05','Proyecto innovador aprobado','2025-03-29'),
+(10,10,4,4,1,'2025-03-07','Buen rendimiento deportivo','2025-03-30')
+ON CONFLICT(id) DO UPDATE SET estudianteId=excluded.estudianteId, tipoBecaId=excluded.tipoBecaId, estadoId=excluded.estadoId, periodoAcademicoId=excluded.periodoAcademicoId, fechaSolicitud=excluded.fechaSolicitud, observaciones=excluded.observaciones, fechaResultado=excluded.fechaResultado;
+
+-- tipo_beca
+INSERT INTO &quot;tipo_beca&quot; (&quot;id&quot;,&quot;nombre&quot;,&quot;descripcion&quot;,&quot;monto&quot;,&quot;estadoId&quot;) VALUES
+(1,'Beca Académica','Para estudiantes con alto rendimiento académico',1000,1),
+(2,'Beca Socioeconómica','Para estudiantes con necesidad económica',1500,1),
+(3,'Beca de Investigación','Para proyectos innovadores',2000,1),
+(4,'Beca Deportiva','Para atletas destacados',1200,1),
+(5,'Beca Artística','Para talentos en arte y cultura',1100,1),
+(6,'Beca de Idiomas','Para estudiantes con dominio de idiomas',1300,1)
+ON CONFLICT(id) DO UPDATE SET nombre=excluded.nombre, descripcion=excluded.descripcion, monto=excluded.monto, estadoId=excluded.estadoId;
+
+-- user
+INSERT INTO &quot;user&quot; (&quot;id&quot;,&quot;username&quot;,&quot;nombre&quot;,&quot;apellidos&quot;,&quot;email&quot;,&quot;password&quot;,&quot;role&quot;) VALUES
+(1,'fmartinez','Francisco','Martínez','francisco.martinez@example.com','$2b$10$cMiAWMEarunhS6vcfEa7.OMF0PtImBOVsYWRIyRCzBxDuqbLCwbc2','admin'),
+(2,'glopez','Gabriela','López','gabriela.lopez@example.com','$2b$10$VnUrqNwLOmRkjcg56MeF8uXdy4Kh2u0ySNgH7QuAoQxPx9DJKs3Ca','evaluador'),
+(3,'jramirez','José','Ramírez','jose.ramirez@example.com','$2b$10$P/jLxdjx72W2jAxuSM6eGu3PfF/E5tKj0kFa9v/QzSuk76nL2CGY6','evaluador'),
+(4,'mluna','María','Luna','maria.luna@example.com','$2b$10$Bq7x.gT35QrZK.O5ozJ9DOa9hb/DxwMuOfXP0VogUu/5ER5FwHTb6','estudiante'),
+(5,'jvargas','Juan','Vargas','juan.vargas@example.com','$2b$10$CbGKSzEqzO9Y94IbY/6eNQ9o3pKn7VaLJG1W3s88x9t5M4n7wN6gi','estudiante')
+ON CONFLICT(id) DO UPDATE SET username=excluded.username, nombre=excluded.nombre, apellidos=excluded.apellidos, email=excluded.email, password=excluded.password, role=excluded.role;
+
+
+PRAGMA foreign_keys = ON;
+</sql><current_tab id="0"/></tab_sql></sqlb_project>

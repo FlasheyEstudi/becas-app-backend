@@ -1,4 +1,3 @@
-// src/ms/TipoBeca/dto/create-TipoBeca.dto.ts
 import { IsNotEmpty, IsNumber, Min } from 'class-validator';
 
 export class CreateTipoBecaDto {

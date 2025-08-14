@@ -3,22 +3,22 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
-import { AuthController } from './auth.controller';
-import { UsersModule } from '../ms/users/users.module';
+import { UsersModule } from '../ms/users/users.module'; // Importar el módulo de usuarios
 
 @Module({
   imports: [
-    PassportModule,
+    PassportModule, // Importar PassportModule
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'mi_secreto_para_jwt',
-      signOptions: { expiresIn: '1h' },
+      secret: 'tu_secreto_secreto', // Usar secreto directo
+      signOptions: { expiresIn: '60m' },
     }),
-    UsersModule,
+    UsersModule, // Importar el módulo de usuarios
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, JwtStrategy, LocalStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}
