@@ -20,6 +20,7 @@ import { CriterioEvaluacionModule } from './ms/CriterioEvaluacion/CriterioEvalua
 import { DetalleEvaluacionModule } from './ms/DetalleEvaluacion/DetalleEvaluacion.module';
 //import { NotificacionModule } from './ms/Notificacion/notificacion.module';
 import { AuditoriaModule } from './ms/Auditoria/Auditoria.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { AuditoriaModule } from './ms/Auditoria/Auditoria.module';
     DetalleEvaluacionModule,
     //NotificacionModule,
     AuditoriaModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
