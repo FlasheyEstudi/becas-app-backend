@@ -14,4 +14,4 @@ import { UsersModule } from '../users/users.module';  // Importa módulo de usua
   providers: [EstudianteService],
   controllers: [EstudianteController],
 })
-export class EstudianteModule {}
+export class EstudianteModule { }

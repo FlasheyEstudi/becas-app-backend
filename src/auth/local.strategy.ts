@@ -1,4 +1,3 @@
-// src/auth/local.strategy.ts
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
@@ -9,14 +8,13 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
     super({
       usernameField: 'identifier',
+      passwordField: 'password', // asegurar que se reciba password
     });
   }
 
-  async validate(identifier: string, password: string): Promise<any> {
+  async validate(identifier: string, password: string) {
     const user = await this.authService.validateCredentials(identifier, password);
-    if (!user) {
-      throw new UnauthorizedException('Credenciales inválidas');
-    }
+    if (!user) throw new UnauthorizedException('Credenciales inválidas');
     return user;
   }
 }

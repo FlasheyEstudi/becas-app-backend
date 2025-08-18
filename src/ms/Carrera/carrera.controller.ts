@@ -1,14 +1,13 @@
-// src/ms/Carrera/carrera.controller.ts
 import { Controller, Post, Body, Get, Param, Delete, Put } from '@nestjs/common';
-import { CarreraService } from './carrera.service'; // Corregido: CarreraService (mayúscula)
-import { CreateCarreraDto } from './dto/create-carrera.dto'; // Corregido: CreateCarreraDto (mayúscula)
+import { CarreraService } from './carrera.service';
+import { CreateCarreraDto } from './dto/create-carrera.dto';
 
 @Controller('carrera')
 export class CarreraController {
-  constructor(private readonly carreraService: CarreraService) {} // Corregido
+  constructor(private readonly carreraService: CarreraService) {}
 
   @Post('/add')
-  create(@Body() dto: CreateCarreraDto) { // Corregido
+  create(@Body() dto: CreateCarreraDto) {
     return this.carreraService.create(dto);
   }
 
@@ -23,7 +22,7 @@ export class CarreraController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() dto: CreateCarreraDto) { // Corregido
+  update(@Param('id') id: string, @Body() dto: CreateCarreraDto) {
     return this.carreraService.update(Number(id), dto);
   }
 

@@ -32,22 +32,27 @@ export class SolicitudBecaService {
   }
 
   async findPending(limit?: number): Promise<SolicitudBeca[]> {
-    const options: {
-      where: { estado: { id: number } };
-      relations: string[];
-      order: { fechaSolicitud: 'DESC' };
-      take?: number;
-    } = {
-      where: { estado: { id: 1 } }, // 1 = Pendiente
-      relations: ['estudiante', 'tipoBeca'],
-      order: { fechaSolicitud: 'DESC' },
-    };
+    try {
+      const options: {
+        where: { estado: { id: number } };
+        relations: string[];
+        order: { fechaSolicitud: 'DESC' };
+        take?: number;
+      } = {
+        where: { estado: { id: 1 } }, // 1 = Pendiente
+        relations: ['estudiante', 'tipoBeca'],
+        order: { fechaSolicitud: 'DESC' },
+      };
 
-    if (limit) {
-      options.take = limit;
+      if (limit && limit > 0) {
+        options.take = limit;
+      }
+
+      return this.solicitudBecaRepository.find(options);
+    } catch (error) {
+      console.error('Error en findPending:', error);
+      throw new Error('Error al obtener solicitudes pendientes');
     }
-
-    return this.solicitudBecaRepository.find(options);
   }
 
   async getMonthlyTrend(months: number): Promise<{ data: number[] }> {

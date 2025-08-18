@@ -10,6 +10,9 @@ export class Estado {
   @Column()
   nombre: string;
 
-  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.estado) // Corregido
+  @Column({ type: 'date', default: () => 'CURRENT_DATE' }) // Added fechaRegistro with default value
+  fechaRegistro: string; // ISO string or Date type
+
+  @OneToMany(() => SolicitudBeca, (solicitudBeca) => solicitudBeca.estado)
   solicitudes: SolicitudBeca[];
 }

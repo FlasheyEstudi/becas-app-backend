@@ -1,10 +1,9 @@
 // src/ms/estudiante/dto/create-estudiante.dto.ts
 export class CreateEstudianteDto {
-  Id?: number;
   nombre: string;
   apellidos: string;
-  edad: number;
   correo: string;
-  EstadoId?: number;
+  estadoId?: number;
   carreraId?: number;
+  rol?: string; // Cambiado de 'role' a 'rol' para mantener consistencia
 }

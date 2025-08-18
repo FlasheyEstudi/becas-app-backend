@@ -13,7 +13,10 @@ export class EstadoService {
   ) {}
 
   async create(dto: CreateEstadoDto): Promise<Estado> {
-    const estado = this.estadoRepository.create(dto);
+    const estado = this.estadoRepository.create({
+      ...dto,
+      fechaRegistro: new Date().toISOString().split('T')[0], // Force current date
+    });
     return this.estadoRepository.save(estado);
   }
 

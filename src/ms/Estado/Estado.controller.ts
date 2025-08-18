@@ -2,27 +2,27 @@ import { Controller, Post, Body, Get, Param, Delete } from '@nestjs/common';
 import { EstadoService } from './Estado.service';
 import { CreateEstadoDto } from './dto/create-Estado.dto';
 
-@Controller('Estado')
+@Controller('estado')
 export class EstadoController {
-  constructor(private readonly EstadoService: EstadoService) {}
+  constructor(private readonly estadoService: EstadoService) {}
 
   @Post('/add')
   create(@Body() dto: CreateEstadoDto) {
-    return this.EstadoService.create(dto);
+    return this.estadoService.create(dto);
   }
 
   @Get()
   findAll() {
-    return this.EstadoService.findAll();
+    return this.estadoService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.EstadoService.findOne(Number(id));
+    return this.estadoService.findOne(Number(id));
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.EstadoService.remove(Number(id));
+    return this.estadoService.remove(Number(id));
   }
 }

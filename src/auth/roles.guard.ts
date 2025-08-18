@@ -1,19 +1,28 @@
+// src/auth/roles.guard.ts
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
+import { ROLES_KEY } from './roles.decorator';
 
+// roles.guard.ts
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
-    if (!requiredRoles) {
-      return true; // No roles required, permitir acceso
-    }
-    const request = context.switchToHttp().getRequest();
-    const user = request.user;
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-    return requiredRoles.includes(user.role);
+    if (!requiredRoles) {
+      return true; // Si no se especifican roles, el endpoint es libre
+    }
+
+    const { user } = context.switchToHttp().getRequest();
+    
+    // Verifica que el usuario tenga uno de los roles requeridos (case-insensitive)
+    return requiredRoles.some(role => 
+      user?.role?.toLowerCase() === role.toLowerCase()
+    );
   }
 }
